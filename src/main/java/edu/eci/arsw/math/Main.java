@@ -5,18 +5,26 @@
  */
 package edu.eci.arsw.math;
 
-import java.util.Arrays;
+import java.time.LocalTime;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author hcadavid
+ * @author LePeanutButter
  */
 public class Main {
+    static Logger logger = Logger.getLogger(Main.class.getName());
 
-    public static void main(String a[]) {
-        System.out.println(bytesToHex(PiDigits.getDigits(0, 10)));
-        System.out.println(bytesToHex(PiDigits.getDigits(1, 100)));
-        System.out.println(bytesToHex(PiDigits.getDigits(1, 1000000)));
+    public static void main(String[] a) throws InterruptedException {
+        LocalTime startTime = LocalTime.now();
+        logger.log(Level.INFO, bytesToHex(PiDigits.getDigits(0, 10, 100)));
+        logger.log(Level.INFO, bytesToHex(PiDigits.getDigits(0, 100, 100)));
+        logger.log(Level.INFO, bytesToHex(PiDigits.getDigits(0, 1000000, 100)));
+        LocalTime endTime = LocalTime.now();
+        String executionTime = "Execution time in seconds:" + String.valueOf(endTime.getSecond() - startTime.getSecond());
+        logger.log(Level.INFO, executionTime);
     }
 
     private final static char[] hexArray = "0123456789ABCDEF".toCharArray();

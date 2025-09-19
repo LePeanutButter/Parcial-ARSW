@@ -8,106 +8,61 @@ package edu.eci.arsw.math;
 ///  </summary>
 public class PiDigits {
 
-    private static int DigitsPerSum = 8;
-    private static double Epsilon = 1e-17;
-
     
     /**
      * Returns a range of hexadecimal digits of pi.
      * @param start The starting location of the range.
      * @param count The number of digits to return
+     * @param N Number of threads
      * @return An array containing the hexadecimal digits.
      */
-    public static byte[] getDigits(int start, int count) {
+    public static byte[] getDigits(int start, int count, int N) throws InterruptedException {
         if (start < 0) {
-            throw new RuntimeException("Invalid Interval");
+            throw new RuntimeException("Invalid Interval for start.");
         }
 
         if (count < 0) {
-            throw new RuntimeException("Invalid Interval");
+            throw new RuntimeException("Invalid Interval for count.");
+        }
+
+        if (N < 0) {
+            throw new RuntimeException("Invalid Interval for N.");
         }
 
         byte[] digits = new byte[count];
-        double sum = 0;
 
-        for (int i = 0; i < count; i++) {
-            if (i % DigitsPerSum == 0) {
-                sum = 4 * sum(1, start)
-                        - 2 * sum(4, start)
-                        - sum(5, start)
-                        - sum(6, start);
+        int difference = count - start;
+        int range = N / difference;
+        int remainder = N % difference;
+        boolean isDivisible = remainder == 0;
+        int size = isDivisible ? range : range + 1;
 
-                start += DigitsPerSum;
-            }
+        PiDigitCalculator[] threads = new PiDigitCalculator[size];
 
-            sum = 16 * (sum - Math.floor(sum));
-            digits[i] = (byte) sum;
+        for (int i = 0; i < range; i++) {
+            int startIndex = start * (i + 1);
+            int endIndex = startIndex + difference - 1;
+            System.out.println("StartIndex: " + startIndex);
+            System.out.println("EndIndex: " + endIndex);
+            threads[i] = new PiDigitCalculator(startIndex, endIndex, digits);
+        }
+
+        if (!isDivisible) {
+            int startIndex = start * (range + 1);
+            int endIndex = startIndex + remainder;
+            System.out.println("StartIndex: " + startIndex);
+            System.out.println("EndIndex: " + endIndex);
+            threads[range] = new PiDigitCalculator(startIndex, endIndex, digits);
+        }
+
+        for (PiDigitCalculator t: threads) {
+            t.start();
+        }
+
+        for (PiDigitCalculator t: threads) {
+            t.join();
         }
 
         return digits;
     }
-
-    /// <summary>
-    /// Returns the sum of 16^(n - k)/(8 * k + m) from 0 to k.
-    /// </summary>
-    /// <param name="m"></param>
-    /// <param name="n"></param>
-    /// <returns></returns>
-    private static double sum(int m, int n) {
-        double sum = 0;
-        int d = m;
-        int power = n;
-
-        while (true) {
-            double term;
-
-            if (power > 0) {
-                term = (double) hexExponentModulo(power, d) / d;
-            } else {
-                term = Math.pow(16, power) / d;
-                if (term < Epsilon) {
-                    break;
-                }
-            }
-
-            sum += term;
-            power--;
-            d += 8;
-        }
-
-        return sum;
-    }
-
-    /// <summary>
-    /// Return 16^p mod m.
-    /// </summary>
-    /// <param name="p"></param>
-    /// <param name="m"></param>
-    /// <returns></returns>
-    private static int hexExponentModulo(int p, int m) {
-        int power = 1;
-        while (power * 2 <= p) {
-            power *= 2;
-        }
-
-        int result = 1;
-
-        while (power > 0) {
-            if (p >= power) {
-                result *= 16;
-                result %= m;
-                p -= power;
-            }
-
-            power /= 2;
-
-            if (power > 0) {
-                result *= result;
-                result %= m;
-            }
-        }
-
-        return result;
-    }
-
 }
