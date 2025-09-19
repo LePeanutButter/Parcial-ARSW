@@ -19,9 +19,9 @@ public class Main {
 
     public static void main(String[] a) throws InterruptedException {
         LocalTime startTime = LocalTime.now();
-        logger.log(Level.INFO, bytesToHex(PiDigits.getDigits(0, 10, 100)));
-        logger.log(Level.INFO, bytesToHex(PiDigits.getDigits(0, 100, 100)));
-        logger.log(Level.INFO, bytesToHex(PiDigits.getDigits(0, 1000000, 100)));
+        logger.log(Level.INFO, bytesToHex(PiDigits.getDigits(0, 10, 2)));
+        logger.log(Level.INFO, bytesToHex(PiDigits.getDigits(0, 100, 10)));
+        logger.log(Level.INFO, bytesToHex(PiDigits.getDigits(0, 1000000, 1000)));
         LocalTime endTime = LocalTime.now();
         String executionTime = "Execution time in seconds:" + String.valueOf(endTime.getSecond() - startTime.getSecond());
         logger.log(Level.INFO, executionTime);

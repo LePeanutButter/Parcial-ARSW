@@ -32,26 +32,22 @@ public class PiDigits {
         byte[] digits = new byte[count];
 
         int difference = count - start;
-        int range = N / difference;
-        int remainder = N % difference;
+        int range = difference / N;
+        int remainder = difference % N;
         boolean isDivisible = remainder == 0;
-        int size = isDivisible ? range : range + 1;
 
-        PiDigitCalculator[] threads = new PiDigitCalculator[size];
+        PiDigitCalculator[] threads = new PiDigitCalculator[N];
+        int endIndex = start - 1;
 
-        for (int i = 0; i < range; i++) {
-            int startIndex = start * (i + 1);
-            int endIndex = startIndex + difference - 1;
-            System.out.println("StartIndex: " + startIndex);
-            System.out.println("EndIndex: " + endIndex);
+        for (int i = 0; i < N; i++) {
+            int startIndex = endIndex + 1;
+            endIndex = i == N - 1 ? startIndex + range : startIndex + range - 1;
             threads[i] = new PiDigitCalculator(startIndex, endIndex, digits);
         }
 
         if (!isDivisible) {
-            int startIndex = start * (range + 1);
-            int endIndex = startIndex + remainder;
-            System.out.println("StartIndex: " + startIndex);
-            System.out.println("EndIndex: " + endIndex);
+            int startIndex = endIndex;
+            endIndex = startIndex + remainder;
             threads[range] = new PiDigitCalculator(startIndex, endIndex, digits);
         }
 
